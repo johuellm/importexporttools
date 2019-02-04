@@ -1,6 +1,6 @@
 # ImportExportTools
 
-This is a mirror of the ImportExport Tools addon, latest version 3.3.2 (2019-02-04). It is curently maintained by [Paolo "Kaosmos"](https://freeshell.de/~kaosmos/mboximport-en.html) and listed on [addons.thunderbird.net](https://addons.thunderbird.net/de/thunderbird/addon/importexporttools/).
+This is a mirror of the ImportExport Tools addon, latest version 3.3.2 (2019-02-04). It is currently maintained by [Paolo "Kaosmos"](https://freeshell.de/~kaosmos/mboximport-en.html) and listed on [addons.thunderbird.net](https://addons.thunderbird.net/de/thunderbird/addon/importexporttools/).
 
 I have implemented several changes to the export overview CSV function, to fix bugs that would screw up the formatting and subsequent processing of the recipients and senders of emails. Find attached the original description.
 
