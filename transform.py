@@ -21,19 +21,6 @@ TIME = 3
 MAX_ADDRESS = 9999
 
 
-def normalize_addr(addr):
-  m = re.findall("<(.+?)>", addr)
-  l = len(m)
-  if l == 1:
-    return m[0].lower().strip()
-  else:
-    # This can either be just one address without <>,
-    # or multiple addresses with <>, or something else.
-    # Just handle all cases as one target (usually only
-    # happens for target).
-    return addr.lower().strip()
-
-
 def add_to_mapping(mapping, index, addresses):
   for addr in addresses:
     s_addr = split_address(addr)
@@ -99,9 +86,7 @@ def split_address(addr):
   for to in email.utils.getaddresses([addr,]):
     # first split the email addresses
     # then decode using the provided encoding, or the default one (maybe use sys.getdefaultencoding() instead?)
-    # addresses.append(" ".join(x[0].decode(x[1] if x[1] is not None else sys.stdout.encoding) for x in email.header.decode_header(to[1])).lower().strip())
     # some email addresses are incorrectly formatted in the original thunderbird address book, try to repair them
-    # Note: empty addresses can be either errors or undisclosed-recipients, if you want to diff
     addresses.append(repair_address(" ".join(x[0] for x in email.header.decode_header(to[1])).lower().strip()))
   return set(addresses)
 
