@@ -702,32 +702,32 @@ function createIndexCSV(type, file2, hdrArray, msgFolder, addBody) {
 		var time2 = time/1000;
 		var obj = new Date(time2);
 		var objHour = obj.getHours();
+		if (objHour < 10)
+			objHour = "0" + objHour;		
 		var objMin = obj.getMinutes();
 		if (objMin < 10)
 			objMin = "0" + objMin;
-		auth = auth.replace(/&gt;/g, ">");
-		auth = auth.replace(/&lt;/g, "<");
-		auth = auth.replace(/\"/g, "");
-		recc = recc.replace(/&gt;/g, ">");
-		recc = recc.replace(/&lt;/g, "<");
-		recc = recc.replace(/\"/g, "");
-		subj = subj.replace(/&gt;/g, ">");
-		subj = subj.replace(/&lt;/g, "<");
+		// auth = auth.replace(/&gt;/g, ">");
+		// auth = auth.replace(/&lt;/g, "<");
+		auth = auth.replace(/\"/g, "\"\"");
+		// recc = recc.replace(/&gt;/g, ">");
+		// recc = recc.replace(/&lt;/g, "<");
+		recc = recc.replace(/\"/g, "\"\"");
+		// subj = subj.replace(/&gt;/g, ">");
+		// subj = subj.replace(/&lt;/g, "<");
 		subj = subj.replace(/\"/g, "\"\"");
-		if (subj.indexOf(sep) > -1)
-			subj = "\""+ subj + "\"";
-		if (auth.indexOf(sep) > -1)
-			auth = "\""+ auth + "\"";
-		if (recc.indexOf(sep) > -1)
-			recc = "\""+ recc + "\"";
+		subj = "\""+ subj + "\"";
+		auth = "\""+ auth + "\"";
+		recc = "\""+ recc + "\"";
 		if (hdrs[6] == 1)
 			var hasAtt = "*";
 		else
 			var hasAtt = " ";
 	
-		var body = addBody ? hdrs[7] : "";
+		var body = addBody ? (sep + hdrs[7]) : "";
 
-		var record = '"'+subj.replace(/\"/g, '""')+'"'+sep+'"'+auth.replace(/\"/g, '""')+'"'+sep+'"'+recc.replace(/\"/g, '""')+'"'+sep+(convertPRTimeToString(time) + " " +objHour+":"+objMin) + sep + hasAtt+ sep + body+"\r\n";
+		/*var record = '"'+subj.replace(/\"/g, '""')+'"'+sep+'"'+auth.replace(/\"/g, '""')+'"'+sep+'"'+recc.replace(/\"/g, '""')+'"'+sep+(convertPRTimeToString(time) + " " +objHour+":"+objMin) + sep + hasAtt+ sep + body+"\r\n";*/
+		var record = subj + sep + auth + sep + recc + sep + (convertPRTimeToString(time) + " " + objHour + ":" + objMin) + sep + hasAtt + body+"\r\n";
 		data = data + record;
 	}
 	if (document.getElementById("IETabortIcon") && addBody)
@@ -1490,13 +1490,12 @@ function IETescapeBeginningFrom(data) {
 }
 
 function IETstoreHeaders(msg, msguri, subfile,addBody) {
-	var subMaxLen = IETprefs.getIntPref("extensions.importexporttools.subject.max_length")-1;
-	var authMaxLen = IETprefs.getIntPref("extensions.importexporttools.author.max_length")-1;
-	var recMaxLen = IETprefs.getIntPref("extensions.importexporttools.recipients.max_length")-1;
+	// var subMaxLen = IETprefs.getIntPref("extensions.importexporttools.subject.max_length")-1;
+	// var authMaxLen = IETprefs.getIntPref("extensions.importexporttools.author.max_length")-1;
+	// var recMaxLen = IETprefs.getIntPref("extensions.importexporttools.recipients.max_length")-1;
 	try {
-		// Cut the subject, the author and the recipients at 50 chars
 		if (msg.mime2DecodedSubject) 
-			var realsubject = msg.mime2DecodedSubject.substring(0, subMaxLen);
+			var realsubject = msg.mime2DecodedSubject;
 		else
 			var realsubject = IETnosub;
 	}
@@ -1507,26 +1506,19 @@ function IETstoreHeaders(msg, msguri, subfile,addBody) {
 	if (msg.flags & 0x0010) 
 		realsubject = "Re: "+realsubject;
 	try {
-		var author = msg.mime2DecodedAuthor.substring(0,authMaxLen);
+		var author = msg.author;
 	}
 	catch(e) {
 		var author = "***";
 	}
 	var time = msg.date;
 	try {
-		var recipients = msg.mime2DecodedRecipients ? msg.mime2DecodedRecipients.substring(0,recMaxLen) : "";
+		var recipients = msg.recipients ? msg.recipients : "";
 	}
 	catch(e) {
 		var recipients = "***";
 	}
-	author = author.replace("<", "&lt;");
-	author = author.replace(">", "&gt;");
-	author = author.replace(/\"/,"");
-	author = author.replace(/^ +/, "");
-	recipients = recipients.replace("<", "&lt;");
-	recipients = recipients.replace(">", "&gt;");
-	recipients = recipients.replace(/\"/,"");
-	recipients = recipients.replace(/^ +/, "");
+
 	// Correct the name of the subject, because it will be also the name of the file html
 	var subject = getSubjectForHdr(msg,subfile.path);
 	// Has attachments?	
