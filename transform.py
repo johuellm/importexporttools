@@ -53,8 +53,13 @@ def process(mapping, file):
       for row in reader:
         rowid = rowid + 1
         for s_addr_source in split_address(row[1]):
-          for s_addr_target in split_address(row[2]):
-            writer.writerow([rowid, mapping[s_addr_source], mapping[s_addr_target], row[3]])
+          s_addr_targets = split_address(row[2])
+          # write a row with empty recipients if there are no recipients
+          if len(s_addr_targets) > 0:
+            for s_addr_target in s_addr_targets:
+              writer.writerow([rowid, mapping[s_addr_source], mapping[s_addr_target], row[3]])
+          else:
+            writer.writerow([rowid, mapping[s_addr_source], "", row[3]])
 
 
 def repair_address(addr):
@@ -87,7 +92,11 @@ def split_address(addr):
     # first split the email addresses
     # then decode using the provided encoding, or the default one (maybe use sys.getdefaultencoding() instead?)
     # some email addresses are incorrectly formatted in the original thunderbird address book, try to repair them
-    addresses.append(repair_address(" ".join(x[0] for x in email.header.decode_header(to[1])).lower().strip()))
+    # Note: empty addresses can be either errors or undisclosed-recipients, if you want to diff
+    try:
+      addresses.append(repair_address(" ".join(x[0] for x in email.header.decode_header(to[1])).lower().strip()))
+    except UnicodeEncodeError:
+      print to[1]
   return set(addresses)
 
   
