@@ -699,14 +699,9 @@ function createIndexCSV(type, file2, hdrArray, msgFolder, addBody) {
 		}
 	
 		// Find hour and minutes of the message
-		var time2 = time/1000;
-		var obj = new Date(time2);
-		var objHour = obj.getHours();
-		if (objHour < 10)
-			objHour = "0" + objHour;		
-		var objMin = obj.getMinutes();
-		if (objMin < 10)
-			objMin = "0" + objMin;
+		// Note: time is of type PRTime, which stores microseconds since epoch
+		//       javascripr date object works with milliseconds
+		var timeobj = new Date(time/1000);
 		// auth = auth.replace(/&gt;/g, ">");
 		// auth = auth.replace(/&lt;/g, "<");
 		auth = auth.replace(/\"/g, "\"\"");
@@ -727,12 +722,37 @@ function createIndexCSV(type, file2, hdrArray, msgFolder, addBody) {
 		var body = addBody ? (sep + hdrs[7]) : "";
 
 		/*var record = '"'+subj.replace(/\"/g, '""')+'"'+sep+'"'+auth.replace(/\"/g, '""')+'"'+sep+'"'+recc.replace(/\"/g, '""')+'"'+sep+(convertPRTimeToString(time) + " " +objHour+":"+objMin) + sep + hasAtt+ sep + body+"\r\n";*/
-		var record = subj + sep + auth + sep + recc + sep + (convertPRTimeToString(time) + " " + objHour + ":" + objMin) + sep + hasAtt + body+"\r\n";
+		var record = subj + sep + auth + sep + recc + sep + convertDateToUTCString(timeobj) + sep + hasAtt + body+"\r\n";
 		data = data + record;
 	}
 	if (document.getElementById("IETabortIcon") && addBody)
 		document.getElementById("IETabortIcon").collapsed = true;
 	IETwriteDataOnDiskWithCharset(clone2,data,false,null,null);
+}
+
+function convertDateToUTCString(time)
+{
+  var year = time.getUTCFullYear();
+  var month = time.getUTCMonth() + 1;  // since js month is 0-11
+  if ( month < 10 )
+    month = "0" + month;
+  var date = time.getUTCDate();
+  if ( date < 10 )
+    date = "0" + date;
+  var hour = time.getUTCHours();
+  if ( hour < 10 ) 
+    hour = "0" + hour
+  var minute = time.getUTCMinutes();
+  if ( minute < 10)
+    minute = "0" + minute;
+  var second = time.getUTCSeconds();
+  if ( second < 10)
+    second = "0" + second;
+
+  var datesep = "-";
+  var timesep = ":";
+
+  return (year + datesep + month + datesep + date + " " + hour + timesep + minute + timesep + second );
 }
 
 function saveMsgAsEML(msguri,file,append,uriArray,hdrArray,fileArray,imapFolder,clipboard,file2,msgFolder) {

@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # author: Joschka Hüllmann <huellmann@uni-muenster.de>
 
+""" ol_extract.py: """
+
 import os.path
 import pypff
 import email
@@ -11,9 +13,6 @@ import email.parser
 import unicodecsv as csv
 
 TARGETS_INBOX = (
-  # "/Stamm - Postfach/IPM_SUBTREE/Deleted Items/Ordner1",
-  # "/Stamm - Postfach/IPM_SUBTREE/Deleted Items/Ordner2",
-  # "/Stamm - Postfach/IPM_SUBTREE/Inbox",
   #"/Oberste Ebene der Outlook-Datendatei/Inbox",
   
 )
