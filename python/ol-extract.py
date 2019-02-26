@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # author: Joschka Hüllmann <huellmann@uni-muenster.de>
 
@@ -42,7 +42,7 @@ def process_message(rows, message, path):
  
 
 def traverse_folder(rows, folder, path="", depth=0):
-  print "[>] ENTERING %s" % path
+  print("[>] ENTERING %s" % path)
   count = 0
   for item in folder.sub_items:
     if isinstance(item, pypff.message):
@@ -53,22 +53,21 @@ def traverse_folder(rows, folder, path="", depth=0):
     else:
       pass
       # print "did not do anything for: %s (type: %s)" % (item.identifier, item.__class__.__name__)
-  print "[v] PROCESSED %d MESSAGES" % count
-  print "[<] LEAVING %s" % path
+  print("[v] PROCESSED %d MESSAGES" % count)
+  print("[<] LEAVING %s" % path)
 
 
 def show_folders(folder, depth=0):
   if folder.name != None:
-    print "%s%s" % ((" "*depth), folder.name.encode("utf-8"))
+    print("%s%s" % ((" "*depth), folder.name.encode("utf-8")))
   for item in folder.sub_folders:
     show_folders(item, depth+1)
 
 
 if __name__ == "__main__":
-  # pff_file = pypff.open("Joschka.Huellmann@wi.uni-muenster.de.ost")
   pff_file = pypff.open("backup.pst")
 
-  # show_folders(root)
+  show_folders(pff_file.root_folder)
 
   try:
     root = pff_file.root_folder
@@ -77,10 +76,6 @@ if __name__ == "__main__":
             "mails.what.csv": []}
 
     traverse_folder(rows, root, "")
-
-    print len(rows["mails.inbox.csv"])
-    print len(rows["mails.sent.csv"])
-    print len(rows["mails.what.csv"])
 
     for file,entries in rows.items():
       with open(os.path.join("", file), 'wb') as wp:

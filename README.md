@@ -4,7 +4,7 @@ This is a mirror of the ImportExport Tools addon, latest version 3.3.2 (2019-02-
 
 I have implemented several changes to the export overview CSV function, to fix bugs that would screw up the formatting and subsequent processing of the recipients and senders of emails. Find attached below the original description.
 
-I also added three [python scripts](https://github.com/johuellm/importexporttools/tree/master/python): The first `transform.py` anonymizes the exported CSV overview. The script `ol-extract` uses [libff](https://github.com/libyal/libpff) python-bindings to traverse an outlook pst-file and extracts the inbox emails. Because the python-bindings are still work in progress and do not include all necessary means to fully export the recipients of the pst file, the script `ol-transform.py` builds on top of the pffexport tool (also in libpff) and parses its output into a format that is compatible with the `transform.py` script.
+I also added three [python scripts](https://github.com/johuellm/importexporttools/tree/master/python): The first `transform.py` anonymizes the exported CSV overview. The script `ol-extract.py` uses [libff](https://github.com/libyal/libpff) python-bindings to traverse an outlook pst-file and extracts the inbox emails. Because the python-bindings are still work in progress and do not include all necessary means to fully export the recipients of the pst file, the script `ol-transform.py` builds on top of the pffexport tool (also in libpff) and parses its output into a format that is compatible with the `transform.py` script.
 
 
 
