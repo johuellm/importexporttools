@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 # author: Joschka Hüllmann <huellmann@uni-muenster.de>
 
@@ -96,7 +96,7 @@ def split_address(addr):
     try:
       addresses.append(repair_address(" ".join(x[0] for x in email.header.decode_header(to[1])).lower().strip()))
     except UnicodeEncodeError:
-      print to[1]
+      print(to[1])
   return set(addresses)
 
   
