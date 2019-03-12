@@ -147,6 +147,17 @@ def resolve_legacyexchangedn_lookup_old(entry, resolve_cache):
 
 
 def refresh_resolve_cache(unresolved_entries):
+  """ This methods takes a list of unresolved legacyExchangeDns and saves them to a temporary file.
+      The temporary file is pushed to a powershell script that invokes the Cmdlet Get-ADObject to
+      try and retrieve the email address from the default active directory. Powershell and the 
+      Active Directory Remote Administration Tools (e.g. WindowsTH-RSAT_WS_1803-x64.msu) are required.
+      The addresses are resolved in the hardcoded file active-directory.csv. First column is the
+      legacyExchangeDn, second column is the email address if available.
+
+    Args:
+      unresolved_entries: The list of legacyExchangeDns
+    Return:
+      None """
 
   # Note: filename is hardcoded in parameter list as well.
   with open("active-directory.new.csv.temp", "w") as fp:
@@ -160,6 +171,17 @@ def refresh_resolve_cache(unresolved_entries):
 
 
 def resolve_legacyexchangedn(rows):
+  """ Resolves the legacyExchangeDn to email address for all rows. It uses a prefetched ActiveDirectory
+      lookup file hardcoded as active-directory.csv. First column is the legacyExchangeDn, second column
+      is the email address if available. The resolve cache is loaded from that prefetched file. Missing
+      entries are then aggregated and fetched via powershell and the Get-ADObject Cmdlet; the resolve
+      cache is refreshed. Then the lookup is performed. Missing entries are not substituted.
+
+    Args:
+      rows: the list of rows to perform lookup on.
+
+    Return:
+      None. The parameter is mutated. """
 
   # Prefetch command
   # Get-ADUser -f {name -like "*"} -Property legacyExchangeDn,mail | Select-Object legacyExchangeDn,mail | Export-Csv OUTPUT.csv
@@ -212,6 +234,8 @@ def resolve_legacyexchangedn(rows):
 
 
 def resolve_legacyexchangedn_old(rows):
+  """ Old method, that looks up the emails for all entries in rows. 
+  """
   resolve_cache = {}
   for row in rows:
     # resolve recipients
@@ -224,6 +248,11 @@ def resolve_legacyexchangedn_old(rows):
 
 
 def get_recipients_str(recipients):
+  """ Concatenates the email part of the recipients tuple, and asserts correct type.
+    Args:
+      recipients: The list of recipient tuples.
+    Return:
+      A comma-separated string of recipients' emails. """
   recipients_str = []
   for recipient in recipients:
     if not isinstance(recipient,tuple) or len(recipient) != 2:
@@ -233,11 +262,26 @@ def get_recipients_str(recipients):
 
 
 def get_format_date(datestr):
+  """ Parses an input datestring to a timezone aware datetime object and then
+      formats it as an UTC string. It can handle strings of the form:
+
+      Feb 06, 2019 09:41:44.223645200 UTC+01:00
+      Feb 06, 2019 09:41:44.223645200 UTC+0100
+      Feb 06, 2019 09:41:44.223645200 UTC
+
+      The strings are found in the Outlook message and item files.
+
+    Args:
+      datestr: The input date string.
+    Return:
+      A date formatted string in the form of 2019-02-06 09:41:44 in UTC. """
+
   # Outlook presents headers that cannot be parsed by python, they look like this:
   # Feb 20, 2019 09:04:50.884749100 UTC+01:00  (the +01:00 may also be absent)
   # What we do:
   #   - remove the colon in timezone string (this behavior/format was changed in python 3.7) 
   #   - remove nanoseconds
+  # TODO: Does only work with UTC and zero-padded digits.
   source_format = "%b %d, %Y %H:%M:%S.%f %Z%z"
   target_format = "%Y-%m-%d %H:%M:%S"
   if len(datestr) == 41 and datestr[-9:-6] == "UTC" and datestr[-3:-2] == ":":
@@ -264,6 +308,13 @@ def get_format_date(datestr):
 
 
 def write_csv(rows, filename):
+  """ Writes the rows to the given file.
+    Args:
+      rows: the list of rows.
+      filename: the output filename.
+    Return:
+      None.
+  """
   with open(filename, "wb") as fp:
     writer = csv.writer(fp, delimiter=',', quotechar='"')
     for row in rows:
@@ -276,6 +327,13 @@ def write_csv(rows, filename):
 
 
 def process_folder_set(root_folder, folder_set, name):
+  """ Processes a set of folders that are exported from pffexport tools.
+    Args:
+      root_folder: The root folder to start looking into.
+      folder_set: The list of folder paths relative to root folder to include in the search and process.
+      name: The name of the output file.
+    Return:
+      None. """
   rows = []
   for folder in folder_set:
     for filename in os.listdir(os.path.join(root_folder,folder)):
@@ -291,6 +349,7 @@ def process_folder_set(root_folder, folder_set, name):
 
 
 if __name__ == "__main__":
+  """ magic main. """
   root_folder = TARGET_ROOT_FOLDER
   process_folder_set(root_folder, TARGETS_SENT, "target.sent.csv")
   process_folder_set(root_folder, TARGETS_INBOX, "target.inbox.csv")

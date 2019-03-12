@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 # author: Joschka Hüllmann <huellmann@uni-muenster.de>
 
-""" ol_extract.py: """
+""" ol_extract.py: This module uses the pypff library to show all the entries in the PST file. Since
+                   the python bindings are work-in-progres, only meetings and emails are shown. """
 
 import os.path
 import pypff
@@ -23,6 +24,13 @@ TARGETS_SENT = (
 
 
 def process_message(rows, message, path):
+  """ Processes a message and appends to the list of rows as specified by path.
+    Args:
+      rows: The dict of output files, with each key being an output file and
+            each value being a list of rows to append to and write to the
+            output file.
+      message: The given message to parse.
+      path: Is the key, to which list to append. """
 
   if path in TARGETS_INBOX:
     outfile = "mails.inbox.csv"
@@ -41,6 +49,12 @@ def process_message(rows, message, path):
  
 
 def traverse_folder(rows, folder, path="", depth=0):
+  """ Recursively traverses a folder and and appends all found items to the rows dict.
+    Args:
+      rows: The dict of row lists to append to. 
+      folder: The current folder name being traversed. 
+      path: The current full path to the folder. 
+      depth: The current recursion depth. """
   print("[>] ENTERING %s" % path)
   count = 0
   for item in folder.sub_items:
@@ -57,6 +71,10 @@ def traverse_folder(rows, folder, path="", depth=0):
 
 
 def show_folders(folder, depth=0):
+  """ Shows or prints all folder names recursively.
+    Args:
+      folder: The top level folder.
+      depth: The recursion depth. """
   if folder.name != None:
     print("%s%s" % ((" "*depth), folder.name.encode("utf-8")))
   for item in folder.sub_folders:
@@ -64,6 +82,7 @@ def show_folders(folder, depth=0):
 
 
 if __name__ == "__main__":
+  """ magic main. """
   pff_file = pypff.open("backup.pst")
 
   show_folders(pff_file.root_folder)
