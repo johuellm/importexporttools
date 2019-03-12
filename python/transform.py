@@ -66,7 +66,7 @@ def parse_csv_to_unique_addresses(file):
     for row in reader:
       addresses.append(row[SOURCE])
       addresses.append(row[TARGET])
-  return set(addresses)
+  return remove_duplicates(addresses)
 
 
 def process(mapping, file):
@@ -155,7 +155,30 @@ def split_address(addr):
       addresses.append(repair_address(" ".join(x[0] for x in email.header.decode_header(to[1])).lower().strip()))
     except UnicodeEncodeError:
       print(to[1])
-  return set(addresses)
+  return remove_duplicates(addresses)
+
+
+def remove_duplicates(seq):
+  """ Since we want to keep the order of the lists, we use this method and not just set.
+      From: https://stackoverflow.com/a/480227 
+
+      Why assign seen.add to seen_add instead of just calling seen.add? Python is a
+      dynamic language, and resolving seen.add each iteration is more costly than
+      resolving a local variable. seen.add could have changed between iterations,
+      and the runtime isn't smart enough to rule that out. To play it safe, it has
+      to check the object each time. If you plan on using this function a lot on
+      the same dataset, perhaps you would be better off with an ordered set:
+      http://code.activestate.com/recipes/528878/
+
+      O(1) insertion, deletion and member-check per operation.
+
+      Args:
+        seq: The sequence which gets duplicates removed.
+      Return:
+        The seq without duplicates. """
+  seen = set()
+  seen_add = seen.add
+  return [x for x in seq if not (x in seen or seen_add(x))]
 
   
 def main():
