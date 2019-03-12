@@ -238,19 +238,18 @@ def get_format_date(datestr):
   # What we do:
   #   - remove the colon in timezone string (this behavior/format was changed in python 3.7) 
   #   - remove nanoseconds
-  # TODO: If the Timezone string is anything else than UTC, we got a problem here.
-  source_format = "%b %d, %Y %H:%M:%S.%f %Z"
+  source_format = "%b %d, %Y %H:%M:%S.%f %Z%z"
   target_format = "%Y-%m-%d %H:%M:%S"
   if len(datestr) == 41 and datestr[-9:-6] == "UTC" and datestr[-3:-2] == ":":
     if sys.version_info[0] > 2 and sys.version_info[1] > 6:
+      pass
+    else:
       datestr = datestr[:-13] + datestr[-10:-3] + datestr[-2:]
-    source_format = source_format + "%z"
   elif len(datestr) == 40 and datestr[-8:-5] == "UTC":
     # Note, this is what we parse from internet headers
     datestr = datestr[:-12] + datestr[-9:]
-    source_format = source_format + "%z"
   elif len(datestr) == 35 and datestr[-3:] == "UTC":
-    datestr = datestr[0:-7] + datestr[-4:]
+    datestr = datestr[0:-7] + datestr[-4:] + "+0000"
   else:
     raise ValueError("Not a date we can parse at this point: %s." % datestr)
 
@@ -258,6 +257,8 @@ def get_format_date(datestr):
   #       So, by using %Z we always get a time aware datetime object and can use
   #       astime with pytz.utc to convert it to UTC and then format the string.
   dt = datetime.strptime(datestr, source_format)
+  if dt.tzinfo == None:
+    raise ValueError("This should not happen, error with missing timezone aware datetime object.")
   dt = dt.astimezone(pytz.utc)
   return dt.strftime(target_format)
 
