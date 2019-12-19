@@ -8,7 +8,7 @@ I also added three [python scripts](https://github.com/johuellm/importexporttool
 
 ## Installation
 
-To install the ImportExportTools addon, just clone the repository and zip the relevant files.
+To install the ImportExportTools addon, just clone the repository and zip the relevant files. Then you can install it like any other Thunderbird Addon from the menu.
 
 ```
 git clone https://github.com/johuellm/importexporttools.git
