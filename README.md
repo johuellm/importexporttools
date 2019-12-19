@@ -6,8 +6,15 @@ I have implemented several changes to the export overview CSV function, to fix b
 
 I also added three [python scripts](https://github.com/johuellm/importexporttools/tree/master/python): The first `transform.py` anonymizes the exported CSV overview. The script `ol-extract.py` uses [libff](https://github.com/libyal/libpff) python-bindings to traverse an outlook pst-file and extracts the inbox emails. Because the python-bindings are still work in progress and do not include all necessary means to fully export the recipients of the pst file, the script `ol-transform.py` builds on top of the pffexport tool (also in libpff) and parses its output into a format that is compatible with the `transform.py` script.
 
+## Installation
 
+To install the ImportExportTools addon, just clone the repository and zip the relevant files.
 
+```
+git clone https://github.com/johuellm/importexporttools.git
+cd importexporttools
+zip -r9 importexporttools.xpi chrome defaults chrome.manifest gpl-3.0.txt install.rdf
+```
 
 ## About this Add-on
 
